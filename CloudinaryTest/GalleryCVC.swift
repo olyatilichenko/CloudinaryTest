@@ -96,6 +96,7 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         photo = photos[indexPath.item]
         let urlString: String
         let type = photo.type
+        print(type)
         if type == "video"{
             urlString = photo.url.replacingOccurrences(of: "mov", with: "jpg")
     
@@ -108,12 +109,12 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         cell.imageView.kf.indicatorType = .activity
         cell.imageView.kf.setImage(with: url)
         
-        /*if type == "video" {
+        if type == "video" {
             let image = UIImage(imageLiteralResourceName: "play")
             let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height))
             imageView.image = image
             cell.imageView.addSubview(imageView)
-        }*/
+        }
         
         return cell
     }
