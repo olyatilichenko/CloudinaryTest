@@ -43,7 +43,7 @@
                                     <constraint firstAttribute="trailing" secondItem="CLO-ur-bbL" secondAttribute="trailing" id="qe9-FD-2DN"/>
                                 </constraints>
                                 <connections>
-                                    <outlet property="imageView" destination="CLO-ur-bbL" id="uyr-AY-kKV"/>
+                                    <outlet property="imageView" destination="CLO-ur-bbL" id="ZQE-ee-n2Z"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>

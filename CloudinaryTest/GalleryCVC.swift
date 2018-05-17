@@ -8,6 +8,11 @@
 
 import UIKit
 import Cloudinary
+import MobileCoreServices
+import Firebase
+import Kingfisher
+import AVKit
+import AVFoundation
 
 private let reuseIdentifier = "Cell"
 
@@ -16,23 +21,34 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
     var photos = [Photo]()
     
     var cld = CLDCloudinary(configuration: CLDConfiguration(cloudName: AppDelegate.cloudName, secure: true))
+    
+    var refPhotos: DatabaseReference!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        refPhotos = Database.database().reference().child("photos")
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+        refPhotos.observe(DataEventType.value, with: { snapshot in
+            if snapshot.childrenCount > 0 {
+                
+                var newPhotos: [Photo] = []
+                
+                for photos in snapshot.children.allObjects as! [DataSnapshot] {
+                    let photoObject = photos.value as? [String: AnyObject]
+                    let url = photoObject?["secure_url"]
+                    let type = photoObject?["resource_type"]
+                    
+                    let photo = Photo(url: url as! String, type: type as! String)
+                    
+                    newPhotos.append(photo!)
+                }
+                
+                self.photos = newPhotos
+                self.collectionView?.reloadData()
+            }
+        })
 
-        // Register cell classes
-        self.collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-
-        // Load any saved photos, otherwise load sample data.
-        /*if let savedPhotos = loadPhotos() {
-            photos += savedPhotos
-        } else {
-            // Load the sample data.
-            loadSamplePhotos()
-        }*/
     }
     
     @IBAction func add(_ sender: Any) {
@@ -71,70 +87,82 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         // #warning Incomplete implementation, return the number of items
         return photos.count
     }
+    
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? PhotoCollectionViewCell else {
-            fatalError("The dequeued cell is not an instance of PhotoCollectionViewCell.")
-        }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PhotoCollectionViewCell
+        
+        var photo: Photo
+        photo = photos[indexPath.item]
+        let urlString: String
+        let type = photo.type
+        if type == "video"{
+            urlString = photo.url.replacingOccurrences(of: "mov", with: "jpg")
     
-        /*let row = indexPath.row
-        let photo = photos[row]
-        
-        let size: CGSize = cell.imageView.frame.size
-        let transformation = CLDTransformation().setWidth(Int(size.width)).setHeight(Int(size.height)).setCrop(.fit)
-        
-        if let publicId = photo.publicId {
-            cell.imageView.cldSetImage(publicId: publicId, cloudinary: cld, transformation: transformation, placeholder: photo.image)
+        } else {
+            urlString = photo.url
         }
         
-        else {
-            
+        let url = URL(string: urlString)
+        
+        cell.imageView.kf.indicatorType = .activity
+        cell.imageView.kf.setImage(with: url)
+        
+        /*if type == "video" {
+            let image = UIImage(imageLiteralResourceName: "play")
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height))
+            imageView.image = image
+            cell.imageView.addSubview(imageView)
         }*/
         
         return cell
     }
-
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
     
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        var photo: Photo
+        photo = photos[indexPath.item]
+        let urlString: String
+        if photo.type == "video"{
+            urlString = photo.url.replacingOccurrences(of: "jpg", with: "mov")
+            let url = URL(string: urlString)
+            
+            let player = AVPlayer(url: url!)
+            let controller = AVPlayerViewController()
+            controller.player = player
+            
+            present(controller, animated: true) {
+                player.play()
+            }
+        } else {
+            urlString = photo.url
+        }
     }
-    */
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        guard let selectedImage = info[UIImagePickerControllerOriginalImage] as? UIImage else {
-            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+        
+        if let selectedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            let data = UIImageJPEGRepresentation(selectedImage, 1.0)
+            cld.createUploader().upload(data: data!, uploadPreset: "olyaTestPreset").response { (response, error) in
+                if let result = response?.resultJson {
+                    self.addPhoto(result)
+                }
+            }
         }
-        if let data = UIImageJPEGRepresentation(selectedImage, 1.0) {
-            cld.createUploader().upload(data: data, uploadPreset: "olyaTestPreset")
+        
+        if let videoUrl = info[UIImagePickerControllerMediaURL] as? NSURL {
+            print(videoUrl)
+            let params = CLDUploadRequestParams()
+                params.setResourceType("video")
+            cld.createUploader().uploadLarge(url: videoUrl as URL, uploadPreset: "olyaTestPreset", params: params, progress: nil).response( { response, error in
+                print(response?.resultJson as Any)
+                if let result = response?.resultJson {
+                    self.addPhoto(result)
+                }
+            })
         }
         dismiss(animated: true, completion: nil)
     }
@@ -144,8 +172,7 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
             let myPickerController = UIImagePickerController()
             myPickerController.delegate = self;
             myPickerController.sourceType = .camera
-            myPickerController.mediaTypes = [UIImagePickerController.availableMediaTypesForSourceType:
-                UIImagePickerControllerSourceType]
+            myPickerController.mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
             self.present(myPickerController, animated: true, completion: nil)
         }
         else{
@@ -165,5 +192,13 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
             myPickerController.sourceType = .photoLibrary
             self.present(myPickerController, animated: true, completion: nil)
         }
+    }
+    
+    func addPhoto(_ json: [String: AnyObject]) {
+        let key = refPhotos.childByAutoId().key
+        
+        var photo = json
+        photo["id"] = key as AnyObject
+        refPhotos.child(key).setValue(photo)
     }
 }

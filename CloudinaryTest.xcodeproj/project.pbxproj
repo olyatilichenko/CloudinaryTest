@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		41944381D82781154CB0534A /* Pods_CloudinaryTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DDA4FDD6A45568AF7CF2769 /* Pods_CloudinaryTest.framework */; };
+		7763DF1820AB114F004BF69B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7763DF1720AB114F004BF69B /* GoogleService-Info.plist */; };
 		77E1FF5520A98DFB00FC2425 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E1FF5420A98DFB00FC2425 /* AppDelegate.swift */; };
 		77E1FF5A20A98DFB00FC2425 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 77E1FF5820A98DFB00FC2425 /* Main.storyboard */; };
 		77E1FF5C20A98DFC00FC2425 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77E1FF5B20A98DFC00FC2425 /* Assets.xcassets */; };
@@ -19,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		011E0D426274C5B36E0F7E08 /* Pods-CloudinaryTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudinaryTest.release.xcconfig"; path = "Pods/Target Support Files/Pods-CloudinaryTest/Pods-CloudinaryTest.release.xcconfig"; sourceTree = "<group>"; };
+		7763DF1720AB114F004BF69B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		77E1FF5120A98DFB00FC2425 /* CloudinaryTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudinaryTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		77E1FF5420A98DFB00FC2425 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		77E1FF5920A98DFB00FC2425 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 		77E1FF5320A98DFB00FC2425 /* CloudinaryTest */ = {
 			isa = PBXGroup;
 			children = (
+				7763DF1720AB114F004BF69B /* GoogleService-Info.plist */,
 				77E1FF5420A98DFB00FC2425 /* AppDelegate.swift */,
 				77E1FF5820A98DFB00FC2425 /* Main.storyboard */,
 				77E1FF5B20A98DFC00FC2425 /* Assets.xcassets */,
@@ -154,6 +157,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7763DF1820AB114F004BF69B /* GoogleService-Info.plist in Resources */,
 				77E1FF5F20A98DFC00FC2425 /* LaunchScreen.storyboard in Resources */,
 				77E1FF5C20A98DFC00FC2425 /* Assets.xcassets in Resources */,
 				77E1FF5A20A98DFB00FC2425 /* Main.storyboard in Resources */,
@@ -190,11 +194,19 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-CloudinaryTest/Pods-CloudinaryTest-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Cloudinary/Cloudinary.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cloudinary.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
