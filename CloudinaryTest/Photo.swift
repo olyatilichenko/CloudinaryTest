@@ -18,12 +18,10 @@ class Photo: NSObject {
     
     init?(url: String, type: String) {
         
-        // The name must not be empty
         guard !url.isEmpty else {
             return nil
         }
         
-        // Initialize stored properties.
         self.url = url
         self.type = type
 

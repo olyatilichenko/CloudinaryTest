@@ -20,10 +20,10 @@ class PlayerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
  
-        let swipeRight = UISwipeGestureRecognizer()
-        swipeRight.addTarget(self, action: #selector(self.back))
-        swipeRight.direction = .down
-        self.view.addGestureRecognizer(swipeRight)
+        let swipeDown = UISwipeGestureRecognizer()
+        swipeDown.addTarget(self, action: #selector(self.back))
+        swipeDown.direction = .down
+        self.view.addGestureRecognizer(swipeDown)
         let stop = UITapGestureRecognizer()
         self.view.addGestureRecognizer(stop)
         stop.addTarget(self, action: #selector(self.stopPlaying))
@@ -47,6 +47,7 @@ class PlayerViewController: UIViewController {
         playSlider.maximumValue = Float(seconds)
         playSlider.minimumValue = 0
         playSlider.isContinuous = true
+        playSlider.setThumbImage(UIImage(), for: .normal)
         
         _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateSlider), userInfo: nil, repeats: true)
         
@@ -55,14 +56,16 @@ class PlayerViewController: UIViewController {
         player?.play()
     }
     
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     @objc func back() {
         dismiss(animated: true, completion: nil)
     }
         
     @objc func playbackSliderValueChanged(_ playSlider:UISlider)
         {
-            print(playSlider.value)
-            
             if let duration = player?.currentItem?.duration {
                 let totalSeconds = CMTimeGetSeconds(duration)
                 

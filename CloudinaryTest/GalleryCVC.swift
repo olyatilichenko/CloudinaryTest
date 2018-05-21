@@ -33,6 +33,7 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
             if snapshot.childrenCount > 0 {
                 
                 var newPhotos: [Photo] = []
+                self.photos.removeAll()
                 
                 for photos in snapshot.children.allObjects as! [DataSnapshot] {
                     let photoObject = photos.value as? [String: AnyObject]
@@ -73,19 +74,21 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
             let destinationVC = segue.destination as? PlayerViewController
             destinationVC?.stringUrl = self.urlString
         }
+        if segue.identifier == "Show" {
+            let destinationVC = segue.destination as? PhotoViewController
+            destinationVC?.stringUrl = self.urlString
+        }
     }
 
 
     // MARK: UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of items
         return photos.count
     }
     
@@ -94,18 +97,15 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PhotoCollectionViewCell
         var photo: Photo
         photo = photos[indexPath.item]
-        print(indexPath.item)
         
         let urlString: String
         let type = photo.type
-        print(type)
         let image = UIImage(imageLiteralResourceName: "play")
         let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height))
         imageView.image = image
         
         if type == "video"{
             urlString = photo.url.replacingOccurrences(of: "mov", with: "jpg")
-            cell.imageView.addSubview(imageView)
         } else {
             urlString = photo.url
         }
@@ -114,6 +114,10 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         
         cell.imageView.kf.indicatorType = .activity
         cell.imageView.kf.setImage(with: url)
+        
+        if type == "video"{
+            cell.imageView.addSubview(imageView)
+        }
         
         return cell
     }
@@ -127,12 +131,14 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         
         if photo.type == "video"{
             urlString = photo.url.replacingOccurrences(of: "jpg", with: "mov")
+            performSegue(withIdentifier: "Play", sender: cell)
             
         } else {
             urlString = photo.url
+            performSegue(withIdentifier: "Show", sender: cell)
         }
         
-        performSegue(withIdentifier: "Play", sender: cell)
+        
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -158,7 +164,6 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
                 print(response?.resultJson as Any)
                 if let result = response?.resultJson {
                     self.addPhoto(result)
-                    print(result)
                 }
             })
         }
@@ -172,6 +177,7 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
             myPickerController.sourceType = .camera
             myPickerController.mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
             myPickerController.videoQuality = .typeHigh
+    
             self.present(myPickerController, animated: true, completion: nil)
         }
         else{
