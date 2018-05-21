@@ -65,15 +65,16 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         self.present(actionSheet, animated: true, completion: nil)
     }
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "Play" {
+            let destinationVC = segue.destination as? PlayerViewController
+            destinationVC?.stringUrl = self.urlString
+        }
     }
-    */
+
 
     // MARK: UICollectionViewDataSource
 
@@ -91,15 +92,20 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PhotoCollectionViewCell
-        
         var photo: Photo
         photo = photos[indexPath.item]
+        print(indexPath.item)
+        
         let urlString: String
         let type = photo.type
         print(type)
+        let image = UIImage(imageLiteralResourceName: "play")
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height))
+        imageView.image = image
+        
         if type == "video"{
             urlString = photo.url.replacingOccurrences(of: "mov", with: "jpg")
-    
+            cell.imageView.addSubview(imageView)
         } else {
             urlString = photo.url
         }
@@ -109,34 +115,24 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
         cell.imageView.kf.indicatorType = .activity
         cell.imageView.kf.setImage(with: url)
         
-        if type == "video" {
-            let image = UIImage(imageLiteralResourceName: "play")
-            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height))
-            imageView.image = image
-            cell.imageView.addSubview(imageView)
-        }
-        
         return cell
     }
     
+    var urlString: String?
+    
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath)
         var photo: Photo
         photo = photos[indexPath.item]
-        let urlString: String
+        
         if photo.type == "video"{
             urlString = photo.url.replacingOccurrences(of: "jpg", with: "mov")
-            let url = URL(string: urlString)
             
-            let player = AVPlayer(url: url!)
-            let controller = AVPlayerViewController()
-            controller.player = player
-            
-            present(controller, animated: true) {
-                player.play()
-            }
         } else {
             urlString = photo.url
         }
+        
+        performSegue(withIdentifier: "Play", sender: cell)
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -162,6 +158,7 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
                 print(response?.resultJson as Any)
                 if let result = response?.resultJson {
                     self.addPhoto(result)
+                    print(result)
                 }
             })
         }
@@ -174,6 +171,7 @@ class GalleryCVC: UICollectionViewController, UIImagePickerControllerDelegate, U
             myPickerController.delegate = self;
             myPickerController.sourceType = .camera
             myPickerController.mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
+            myPickerController.videoQuality = .typeHigh
             self.present(myPickerController, animated: true, completion: nil)
         }
         else{
